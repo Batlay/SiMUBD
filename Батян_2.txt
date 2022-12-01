@@ -1,0 +1,44 @@
+CREATE DATABASE university
+ON PRIMARY (FILENAME = 'C:\Users\yanaB\Documents\database\university.mdf', 
+SIZE = 10, NAME = 'university');
+
+USE University EXEC sp_addrole 'DEKAN';
+USE University EXEC sp_addrole 'STUDENT';
+USE University EXEC sp_addrole 'TEACHER';
+
+USE University
+create table Discuplinu (
+Kod_Discuplinu int NOT NULL primary key, 
+name_Discuplinu nchar(30) NULL, 
+kol_chasov int NULL
+);
+
+GRANT DELETE, INSERT, UPDATE, SELECT ON Kafedra TO DEKAN 
+GRANT EXECUTE TO DEKAN;
+
+GRANT SELECT ON Groups TO STUDENT;
+
+GRANT SELECT ON Vedomost TO TEACHER;
+
+EXEC sp_addlogin 'Lihachevskii_DEK','Lihachevskii', 'University' 
+use University
+EXEC sp_adduser 'Lihachevskii_DEK','Lihachevskii_DEK' 
+EXEC sp_addrolemember 'DEKAN', 'Lihachevskii_DEK';
+
+EXEC sp_addlogin 'Batyan_Stud','Batyan', 'University'
+use University
+EXEC sp_adduser 'Batyan_Stud','Batyan_Stud'
+EXEC sp_addrolemember 'STUDENT', 'Batyan_Stud';
+
+EXEC sp_addlogin 'Kovalenko_Teach','Kovalenko', 'University'
+use University
+EXEC sp_adduser 'Kovalenko_Teach','Kovalenko_Teach'
+EXEC sp_addrolemember 'TEACHER', 'Kovalenko_Teach';
+
+
+
+
+
+
+
+

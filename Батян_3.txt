@@ -1,0 +1,228 @@
+USE university
+
+--использование операторов сравнения;
+SELECT *
+FROM Facultet
+WHERE Korpus_number = 1;
+
+SELECT *
+FROM Groups
+WHERE course > 3;
+
+SELECT * 
+FROM Vedomost
+WHERE Mark < 10;
+
+--использование логических операторов AND, OR и NOT
+SELECT * 
+FROM Kafedra
+WHERE Teachers_count > 20 AND Korpus_number = 3;
+
+SELECT * 
+FROM Students
+WHERE Gender = 'Мужской' OR City = 'Минск';
+
+--Проверка на принадлежность множеству
+SELECT * 
+FROM Students
+WHERE  City NOT  IN ('Минск'); 
+
+SELECT * 
+FROM Groups
+WHERE  Name_group  IN ('914301', '914302');  
+
+--Проверка на принадлежность диапазону значений/использование комбинации логических операторов
+SELECT *
+From Groups
+WHERE Students_count BETWEEN 20 AND 30;
+
+--Проверка на соответствие шаблону
+SELECT *
+FROM Students
+WHERE Surname NOT LIKE 'Б%'
+
+SELECT * FROM Facultet
+WHERE LOWER(FIO_decan) LIKE '%чев%';
+
+
+--Проверка на принадлежность диапазону значений/Использование выражений над столбцами
+SELECT Surname, Name FROM Students
+WHERE Id_group BETWEEN 1 AND 3;
+
+SELECT Name_group, 2 * Students_count
+FROM Groups
+WHERE Students_count BETWEEN 2*10 AND 3*10;
+
+
+--Проверка на неопределенное значение
+SELECT *
+FROM Students
+WHERE Third_name IS NOT Null;
+
+SELECT *
+FROM Students
+WHERE Third_name IS Null;
+
+--Декартово произведение таблиц
+SELECT *
+FROM Kafedra, Facultet
+
+SELECT Facultet.Name_facultet, Facultet.Id_facultet,Facultet.FIO_decan,  Kafedra.Id_facultet, Kafedra.Name_kafedra, Kafedra.FIO_zavkaf
+FROM	Facultet, Kafedra;
+
+--Соединение таблиц по равенству
+SELECT Groups.Name_group, Students.Surname FROM	Groups, Students
+WHERE Groups.Id_group = Students.Id_group;
+
+SELECT Facultet.Name_facultet, Kafedra.Name_kafedra    FROM	Facultet, Kafedra
+WHERE FACULTET.Id_facultet = KAFEDRA.Id_facultet;
+
+--Соединение таблиц по равенству и условию отбора
+SELECT Facultet.Name_facultet, Kafedra.Name_kafedra    FROM	Facultet, Kafedra
+WHERE Facultet.Id_facultet = Kafedra.Id_facultet AND Facultet.Name_facultet = 'ФКП';
+
+SELECT Groups.Name_group, Students.Surname FROM	Groups, Students
+WHERE Groups.Id_group = Students.Id_group AND Groups.Name_group = '914301';
+
+--Соединение таблиц по трем таблицам
+SELECT * FROM Groups, Students, Vedomost
+WHERE Groups.Id_group = Students.Id_group AND Vedomost.Id_group=Groups.Id_group
+AND Groups.Name_group='914301';
+
+SELECT Students.Surname, Vedomost.Subject_name,Mark, Groups.Name_group FROM Groups, Students, Vedomost
+WHERE Groups.Id_group = Students.Id_group AND Vedomost.Id_group=Groups.Id_group;
+
+--Левое внешнее присоединение
+SELECT Facultet.Name_facultet, Kafedra.Name_kafedra    FROM	Facultet
+LEFT OUTER JOIN Kafedra ON Facultet.Id_facultet = Kafedra.Id_facultet;
+
+--Правое внешнее присоединение
+SELECT Groups.Name_group, Students.Surname FROM	Students
+RIGHT OUTER JOIN Groups ON Groups.Id_group = Students.Id_group;
+
+--Полное равое внешнее присоединение
+SELECT Groups.Name_group, Students.Surname FROM	Students
+CROSS JOIN Groups;
+
+--Симметричное соединение и удаление избыточности
+SELECT needed.Name_kafedra
+FROM Kafedra needed, Kafedra given
+WHERE needed.Korpus_number = given.Korpus_number AND
+given.Name_kafedra = 'ЭТТ' AND needed.Name_kafedra <> 'ЭТТ';
+
+--СOUNT/SUM/UPPER/
+Select count(*) AS 'Количество студентов'
+From Students
+
+Select count(*) AS 'Количество групп 4 курса'
+From Groups Where Name_group like '9%';
+
+Select SUM(Teachers_count)
+From kafedra
+
+Select SUM(Students_count)
+From Groups Where Name_group like '9%';
+
+SELECT UPPER(Name_facultet) AS 'Большие буквы'
+From facultet;
+
+SELECT LOWER(Surname) AS 'Маленькие буквы'
+From students;
+
+--Временные функции
+Select Surname
+From Students 
+WHERE datename(Year, Date_of_birth) = 2001;
+
+Select Surname, Date_of_birth AS 'Дата рождения', dateadd(Year,1, Date_of_birth) AS 'Плюс год'
+From Students 
+WHERE Surname like 'Б%'
+
+--Группировки по одному столбцу
+SELECT Korpus_number AS 'Корпус',
+count(*) AS "K-вo кафедр" FROM Kafedra
+GROUP BY Korpus_number ;
+
+SELECT City AS 'Город',
+count(*) AS "K-вo студентов" FROM Students
+GROUP BY City;
+
+--Группировка по нескольким столбцам
+SELECT g.Name_group,
+count(*) AS "Кол-во студентов в группе" FROM	Groups g, Students s
+WHERE g.Id_group = s.Id_group  AND
+g.Students_count > 20
+GROUP BY g.Name_group;
+
+SELECT f.Name_facultet,
+count(*) AS "Кол-во кафедр на факультете" FROM	Facultet f, Kafedra k
+WHERE f.Id_facultet = k.Id_facultet
+GROUP BY f.Name_facultet;
+
+
+--с использованием условия отбора групп HAVING
+SELECT f.Name_facultet, Count(*) FROM	FACULTET f, KAFEDRA d
+WHERE f.Id_facultet = d.Id_facultet 
+GROUP BY f.Name_facultet HAVING COUNT(*) > 0;
+
+SELECT g.Name_group, Count(*) FROM	Groups g, Students s
+WHERE g.Id_group = s.Id_group 
+GROUP BY g.Name_group HAVING COUNT(*) > 2;
+
+--с использованием фразы HAVING без фразы GROUP BY
+SELECT AVG(Students_count), AVG(Course) 
+FROM Groups
+WHERE Name_group like '9%' 
+HAVING AVG(Students_count) > 20;
+
+
+
+--с использованием сортировки по столбцу
+SELECT Surname FROM	Students
+wheRE Id_group = 1 
+ORDER BY Surname;
+
+Select *
+FROM Facultet
+Order BY Name_facultet DESC;
+
+--добавление новых данных в таблицу
+INSERT INTO Students(Surname, Name, Id_group,Date_of_birth, Gender, City) 
+VALUES('Кошкин', 'Петр', 1, '22-10-2003', 'Мужской', 'Гродно');
+
+INSERT INTO Groups 
+VALUES('920602', 2019, 4, 24);
+
+--добавление новых данных по результатам запроса в качестве вставляемого значения;
+INSERT INTO Kafedra (Id_facultet, Name_kafedra, fio_zavkaf) VALUES ( 1, 'Новая кафедра', (SELECT FIO_decan 
+FROM FACULTET WHERE LOWER(Name_facultet) = 'фкп'));
+
+INSERT INTO Groups 
+VALUES('920602', (SELECT Year_post FROM Groups WHERE Name_group='914301'), 4, 24);
+
+
+--обновление существующих данных в таблице
+UPDATE Students
+SET Date_of_birth = '21-07-2001' WHERE Surname ='Батян' AND Name ='Глеб' AND Third_name ='Павлович';
+
+UPDATE Vedomost
+SET Mark = 8 WHERE Id_vedomost = 3 AND Id_student=3;
+
+
+--обновление существующих данных по результатам подзапроса во фразе WHERE
+UPDATE Facultet
+SET Name_facultet = 'ФКП'
+WHERE Id_facultet = (SELECT Id_facultet FROM Kafedra WHERE LOWER(Name_kafedra) = 'пикс');
+
+UPDATE Groups
+SET Name_group = '914301'
+WHERE Id_group = (SELECT Id_group FROM Students WHERE Surname = 'Батян');
+
+
+--удаление существующих данных
+DELETE FROM Students WHERE Surname = 'Кошкин' AND Name ='Петр';
+
+DELETE FROM Groups WHERE Name_group ='920602';
+
+
+

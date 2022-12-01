@@ -1,0 +1,75 @@
+
+
+1. db.towns.find({"mayor.party": "I"}, {_id: false, populatiuon: false, last_sensus: false, famous_for: false})
+
+db.towns.find({"mayor.party": {$exists: false}}, {_id: false, populatiuon: false, last_sensus: false, famous_for: false})
+
+fn = function() { return {gender:"m"}; },
+db.unicorns.find(fn).sort({name: 1})
+db.unicorns.find({gender:"m"})
+
+2.var cursor = db.unicorns.find({gender:"m"});null;
+cursor.limit(2).sort({name:1});null;
+cursor.forEach(function(obj){print(obj.name);})
+
+3. db.unicorns.find({gender: "f", weight: {$gt : 500, $lt: 600}}, {_id: false}).count()
+
+5. db.unicorns.aggregate({"$group":{_id:"$gender",count:{$sum:1}}}) 
+
+6. db.unicorns.save({name: 'Barny', loves: ['grape'], weight: 340, gender: 'm'})
+
+7. db.unicorns.updateOne({name : "Ayna"}, {$set: {weight: 800, vampires : 51}}, {upsert: true})
+
+8. db.unicorns.updateOne({name : "Raleigh"}, {$set: {loves: ["redbull"]}}, {upsert: true})
+
+9. db.unicorns.updateMany({}, {$inc: {vampires: 5}}, {multi:true})
+
+10. db.towns.updateOne({name: "Portland"}, {$set: {"mayor.party": ""}}, {upsert: true})
+
+11. db.unicorns.updateOne({name : "Pilot"}, {$push: {loves: "chocolate"}}, {upsert: true})
+
+12. db.unicorns.updateOne({name : "Aurora"}, {$push: {loves: "sugar", "limons"}}, {upsert: true})
+
+13. db.towns.remove({"mayor.party": ""})
+    db.towns.remove({})
+
+2.1 db.createCollection("areas")  
+	db.areas.insert({_id:"field", name:"Magic Fileds"})
+	db.areas.insert({_id:"clouds", name:"Magic Clouds"})
+	db.unicorns.insert({name: 'New', dob: new Date(1976, 6, 18, 18, 18), loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165, area:{$ref:"areas", $id: "field"}})
+
+	db.unicorns.updateOne({_id:ObjectId("636a5020f6cb7fcb498e2d01")},{$set: {area:{$ref:"areas", $id: "clouds"}}})
+	
+2.2 db.unicorns.ensureIndex({"name" : 1}, {"unique" : true}) 
+2.3 db.unicorns.getIndexes()
+    db.unicorns.dropIndex("name_1")
+}
+2.4 db.createCollection("numbers") 
+    for(i = 0; i < 100000; i++){db.numbers.insert({value: i})}
+    db.numbers.find().sort({$natural:-1}).limit(4)
+    db.numbers.explain("executionStats").find({})
+    db.numbers.ensureIndex({"value" : 1})
+    db.numbers.dropIndex("value_1")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
